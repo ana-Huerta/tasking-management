@@ -1,0 +1,32 @@
+.projects-tab {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.projects-header h2 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.projects-content {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 2rem;
+}
+
+.projects-form-section {
+  min-width: 0;
+}
+
+.projects-list-section {
+  min-width: 0;
+}
+
+@media (max-width: 1024px) {
+  .projects-content {
+    grid-template-columns: 1fr;
+  }
+}

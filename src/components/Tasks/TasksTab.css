@@ -1,0 +1,32 @@
+.tasks-tab {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.tasks-header h2 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.tasks-content {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 2rem;
+}
+
+.tasks-form-section {
+  min-width: 0;
+}
+
+.tasks-list-section {
+  min-width: 0;
+}
+
+@media (max-width: 1024px) {
+  .tasks-content {
+    grid-template-columns: 1fr;
+  }
+}

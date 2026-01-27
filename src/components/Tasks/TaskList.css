@@ -1,0 +1,110 @@
+.task-list-card {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
+
+.task-list-card h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 1.5rem;
+}
+
+.task-list-container {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.task-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.task-table thead {
+  background: var(--background);
+  border-bottom: 2px solid var(--border);
+}
+
+.task-table th {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.task-table td {
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-light);
+  color: var(--text-primary);
+}
+
+.task-table tbody tr {
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.task-table tbody tr:hover {
+  background: var(--background);
+}
+
+.task-table tbody tr.selected {
+  background: rgba(99, 102, 241, 0.1);
+  border-left: 3px solid var(--primary);
+}
+
+.task-title {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.status-badge,
+.priority-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: white;
+  text-transform: capitalize;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-secondary);
+}
+
+.empty-state p {
+  margin-bottom: 0.5rem;
+}
+
+.empty-hint {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 768px) {
+  .task-table {
+    font-size: 0.75rem;
+  }
+
+  .task-table th,
+  .task-table td {
+    padding: 0.5rem;
+  }
+
+  .task-table th:nth-child(5),
+  .task-table td:nth-child(5),
+  .task-table th:nth-child(6),
+  .task-table td:nth-child(6) {
+    display: none;
+  }
+}

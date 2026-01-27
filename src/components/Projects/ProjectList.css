@@ -1,0 +1,80 @@
+.project-list-card {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
+
+.project-list-card h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 1.5rem;
+}
+
+.project-list-container {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.project-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.project-table thead {
+  background: var(--background);
+  border-bottom: 2px solid var(--border);
+}
+
+.project-table th {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.project-table td {
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-light);
+  color: var(--text-primary);
+}
+
+.project-table tbody tr {
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.project-table tbody tr:hover {
+  background: var(--background);
+}
+
+.project-table tbody tr.selected {
+  background: rgba(99, 102, 241, 0.1);
+  border-left: 3px solid var(--primary);
+}
+
+.project-name {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-secondary);
+}
+
+.empty-state p {
+  margin-bottom: 0.5rem;
+}
+
+.empty-hint {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}

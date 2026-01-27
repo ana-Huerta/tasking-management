@@ -1,0 +1,36 @@
+.dashboard {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--background);
+}
+
+.dashboard-content {
+  flex: 1;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 2rem;
+}
+
+.tab-content-wrapper {
+  margin-top: 2rem;
+  animation: fadeIn 0.2s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-content {
+    padding: 1rem;
+  }
+}

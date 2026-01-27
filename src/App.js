@@ -1,23 +1,38 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from 'react';
+import { Storage } from './services/storage';
+import Login from './components/Login/Login';
+import Dashboard from './components/Dashboard/Dashboard';
+import './styles/App.css';
 
 function App() {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    Storage.init();
+    // Verificar si hay un usuario guardado en sessionStorage
+    const savedUser = sessionStorage.getItem('currentUser');
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
+    }
+  }, []);
+
+  const handleLogin = (userData) => {
+    setUser(userData);
+    sessionStorage.setItem('currentUser', JSON.stringify(userData));
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    sessionStorage.removeItem('currentUser');
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="app">
+      {!user ? (
+        <Login onLogin={handleLogin} />
+      ) : (
+        <Dashboard user={user} onLogout={handleLogout} />
+      )}
     </div>
   );
 }
