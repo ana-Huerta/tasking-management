@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { api } from '../../services/api';
+import { api } from '../../services/index';
 import TaskForm from './TaskForm';
 import TaskList from './TaskList';
 import TaskStats from './TaskStats';
