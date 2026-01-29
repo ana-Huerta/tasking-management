@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
-const HistoryEntry = require('../models/HistoryEntry');
+const HistoryEntry = require('../models/Historial');
 
 // GET
 router.get('/', async (req, res) => {
