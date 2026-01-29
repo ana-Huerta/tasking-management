@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
 const Task = require('../models/Task');
-const HistoryEntry = require('../models/HistoryEntry');
+const HistoryEntry = require('../models/Historial');
 const Notification = require('../models/Notification');
 
 const toObjectId = (v) => {
