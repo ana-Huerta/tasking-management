@@ -1,55 +1,67 @@
 import React, { useState } from 'react';
-import { Storage } from '../../services/storage';
+import { api } from '../../services/api';
 import './CommentsTab.css';
 
 const CommentsTab = ({ user }) => {
   const [taskId, setTaskId] = useState('');
   const [commentText, setCommentText] = useState('');
   const [comments, setComments] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const handleAddComment = () => {
-    const taskIdNum = parseInt(taskId);
-    if (!taskIdNum) {
+  const handleAddComment = async () => {
+    const tid = taskId.trim();
+    if (!tid) {
       alert('ID de tarea requerido');
       return;
     }
-
     if (!commentText.trim()) {
       alert('El comentario no puede estar vacío');
       return;
     }
-
-    Storage.addComment({
-      taskId: taskIdNum,
-      userId: user.id,
-      commentText: commentText.trim()
-    });
-
-    setCommentText('');
-    loadComments();
-    alert('Comentario agregado');
+    setLoading(true);
+    try {
+      await api.addComment({
+        taskId: tid,
+        userId: user.id,
+        commentText: commentText.trim()
+      });
+      setCommentText('');
+      await loadComments();
+    } catch (err) {
+      alert(err.message || 'Error al agregar comentario');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const loadComments = () => {
-    const taskIdNum = parseInt(taskId);
-    if (!taskIdNum) {
+  const loadComments = async () => {
+    const tid = taskId.trim();
+    if (!tid) {
       setComments([]);
       return;
     }
-
-    const allComments = Storage.getComments().filter(c => c.taskId === taskIdNum);
-    const users = Storage.getUsers();
-    
-    const formattedComments = allComments.map(comment => {
-      const commentUser = users.find(u => u.id === comment.userId);
-      return {
-        ...comment,
-        username: commentUser ? commentUser.username : 'Usuario',
-        date: new Date(comment.createdAt).toLocaleString('es-ES')
-      };
-    });
-
-    setComments(formattedComments);
+    setLoading(true);
+    try {
+      const [commentsRes, usersRes] = await Promise.all([
+        api.getComments(tid),
+        api.getUsers()
+      ]);
+      const users = Array.isArray(usersRes) ? usersRes : [];
+      const list = Array.isArray(commentsRes) ? commentsRes : [];
+      const formatted = list.map(c => {
+        const u = users.find(x => x.id === c.userId);
+        return {
+          ...c,
+          username: u ? u.username : 'Usuario',
+          date: new Date(c.createdAt).toLocaleString('es-ES')
+        };
+      });
+      setComments(formatted);
+    } catch (err) {
+      setComments([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -64,11 +76,11 @@ const CommentsTab = ({ user }) => {
           <div className="form-group">
             <label htmlFor="taskId">ID Tarea</label>
             <input
-              type="number"
+              type="text"
               id="taskId"
               value={taskId}
               onChange={(e) => setTaskId(e.target.value)}
-              placeholder="ID de la tarea"
+              placeholder="ID de la tarea (MongoDB)"
             />
           </div>
           <div className="form-group">
@@ -82,10 +94,10 @@ const CommentsTab = ({ user }) => {
             />
           </div>
           <div className="form-actions">
-            <button onClick={handleAddComment} className="btn-primary">
-              Agregar Comentario
+            <button onClick={handleAddComment} className="btn-primary" disabled={loading}>
+              {loading ? 'Enviando…' : 'Agregar Comentario'}
             </button>
-            <button onClick={loadComments} className="btn-secondary">
+            <button onClick={loadComments} className="btn-secondary" disabled={loading}>
               Cargar Comentarios
             </button>
           </div>
@@ -97,7 +109,9 @@ const CommentsTab = ({ user }) => {
             {comments.length > 0 && ` (${comments.length})`}
           </h3>
           {taskId ? (
-            comments.length > 0 ? (
+            loading ? (
+              <div className="empty-state"><p>Cargando…</p></div>
+            ) : comments.length > 0 ? (
               <div className="comments-list">
                 {comments.map(comment => (
                   <div key={comment.id} className="comment-item">

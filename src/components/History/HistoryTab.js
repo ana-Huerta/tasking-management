@@ -1,50 +1,61 @@
 import React, { useState } from 'react';
-import { Storage } from '../../services/storage';
+import { api } from '../../services/api';
 import './HistoryTab.css';
 
 const HistoryTab = () => {
   const [taskId, setTaskId] = useState('');
   const [history, setHistory] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const loadHistory = () => {
-    const taskIdNum = parseInt(taskId);
-    if (!taskIdNum) {
+  const loadHistory = async () => {
+    const tid = taskId.trim();
+    if (!tid) {
       setHistory([]);
       return;
     }
-
-    const allHistory = Storage.getHistory().filter(h => h.taskId === taskIdNum);
-    const users = Storage.getUsers();
-    
-    const formattedHistory = allHistory.map(entry => {
-      const entryUser = users.find(u => u.id === entry.userId);
-      return {
-        ...entry,
-        username: entryUser ? entryUser.username : 'Desconocido',
-        date: new Date(entry.timestamp).toLocaleString('es-ES')
-      };
-    });
-
-    setHistory(formattedHistory);
-  };
-
-  const loadAllHistory = () => {
-    const allHistory = Storage.getHistory();
-    const users = Storage.getUsers();
-    
-    const formattedHistory = allHistory
-      .slice(-100)
-      .reverse()
-      .map(entry => {
-        const entryUser = users.find(u => u.id === entry.userId);
+    setLoading(true);
+    try {
+      const data = await api.getHistory(tid);
+      const usersRes = await api.getUsers();
+      const users = Array.isArray(usersRes) ? usersRes : [];
+      const list = Array.isArray(data) ? data : [];
+      const formatted = list.map(entry => {
+        const u = users.find(x => x.id === entry.userId);
         return {
           ...entry,
-          username: entryUser ? entryUser.username : 'Desconocido',
+          username: u ? u.username : 'Desconocido',
           date: new Date(entry.timestamp).toLocaleString('es-ES')
         };
       });
+      setHistory(formatted);
+    } catch (err) {
+      setHistory([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    setHistory(formattedHistory);
+  const loadAllHistory = async () => {
+    setLoading(true);
+    try {
+      const data = await api.getHistory();
+      const usersRes = await api.getUsers();
+      const users = Array.isArray(usersRes) ? usersRes : [];
+      const list = Array.isArray(data) ? data : [];
+      const formatted = list.map(entry => {
+        const u = users.find(x => x.id === entry.userId);
+        return {
+          ...entry,
+          username: u ? u.username : 'Desconocido',
+          date: new Date(entry.timestamp).toLocaleString('es-ES')
+        };
+      });
+      setHistory(formatted);
+    } catch (err) {
+      setHistory([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -59,18 +70,18 @@ const HistoryTab = () => {
           <div className="form-group">
             <label htmlFor="taskId">ID Tarea</label>
             <input
-              type="number"
+              type="text"
               id="taskId"
               value={taskId}
               onChange={(e) => setTaskId(e.target.value)}
-              placeholder="ID de la tarea"
+              placeholder="ID de la tarea (opcional)"
             />
           </div>
           <div className="form-actions">
-            <button onClick={loadHistory} className="btn-primary">
+            <button onClick={loadHistory} className="btn-primary" disabled={loading}>
               Cargar Historial
             </button>
-            <button onClick={loadAllHistory} className="btn-secondary">
+            <button onClick={loadAllHistory} className="btn-secondary" disabled={loading}>
               Cargar Todo el Historial
             </button>
           </div>
@@ -81,7 +92,9 @@ const HistoryTab = () => {
             Historial {taskId && `- Tarea #${taskId}`}
             {history.length > 0 && ` (${history.length})`}
           </h3>
-          {history.length > 0 ? (
+          {loading ? (
+            <div className="empty-state"><p>Cargando…</p></div>
+          ) : history.length > 0 ? (
             <div className="history-list">
               {history.map(entry => (
                 <div key={entry.id} className="history-item">

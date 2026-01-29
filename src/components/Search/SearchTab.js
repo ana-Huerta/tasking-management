@@ -1,39 +1,49 @@
 import React, { useState, useEffect } from 'react';
-import { Storage } from '../../services/storage';
+import { api } from '../../services/api';
 import './SearchTab.css';
 
 const SearchTab = () => {
   const [searchText, setSearchText] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [priorityFilter, setPriorityFilter] = useState('');
-  const [projectFilter, setProjectFilter] = useState(0);
+  const [projectFilter, setProjectFilter] = useState('');
   const [results, setResults] = useState([]);
   const [projects, setProjects] = useState([]);
+  const [tasks, setTasks] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setProjects(Storage.getProjects());
+    const load = async () => {
+      setLoading(true);
+      try {
+        const [tasksRes, projectsRes] = await Promise.all([
+          api.getTasks(),
+          api.getProjects()
+        ]);
+        setTasks(Array.isArray(tasksRes) ? tasksRes : []);
+        setProjects(Array.isArray(projectsRes) ? projectsRes : []);
+      } catch (err) {
+        setTasks([]);
+        setProjects([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
   }, []);
 
   const handleSearch = () => {
-    const tasks = Storage.getTasks();
     const filtered = tasks.filter(task => {
-      if (searchText && 
-          !task.title.toLowerCase().includes(searchText.toLowerCase()) && 
-          !task.description.toLowerCase().includes(searchText.toLowerCase())) {
+      if (searchText &&
+          !(task.title || '').toLowerCase().includes(searchText.toLowerCase()) &&
+          !(task.description || '').toLowerCase().includes(searchText.toLowerCase())) {
         return false;
       }
-      if (statusFilter && task.status !== statusFilter) {
-        return false;
-      }
-      if (priorityFilter && task.priority !== priorityFilter) {
-        return false;
-      }
-      if (projectFilter > 0 && task.projectId !== projectFilter) {
-        return false;
-      }
+      if (statusFilter && task.status !== statusFilter) return false;
+      if (priorityFilter && task.priority !== priorityFilter) return false;
+      if (projectFilter && task.projectId !== projectFilter) return false;
       return true;
     });
-
     setResults(filtered);
   };
 
@@ -57,6 +67,15 @@ const SearchTab = () => {
     };
     return colors[priority] || '#64748b';
   };
+
+  if (loading) {
+    return (
+      <div className="search-tab">
+        <div className="search-header"><h2>Búsqueda Avanzada</h2></div>
+        <div className="loading-state">Cargando…</div>
+      </div>
+    );
+  }
 
   return (
     <div className="search-tab">
@@ -109,9 +128,9 @@ const SearchTab = () => {
             <select
               id="projectFilter"
               value={projectFilter}
-              onChange={(e) => setProjectFilter(parseInt(e.target.value) || 0)}
+              onChange={(e) => setProjectFilter(e.target.value)}
             >
-              <option value="0">Todos</option>
+              <option value="">Todos</option>
               {projects.map(project => (
                 <option key={project.id} value={project.id}>
                   {project.name}

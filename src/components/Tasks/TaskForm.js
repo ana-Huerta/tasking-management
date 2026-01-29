@@ -20,10 +20,10 @@ const TaskForm = ({ task, projects, users, onAdd, onUpdate, onDelete, onClear })
         description: task.description || '',
         status: task.status || 'Pendiente',
         priority: task.priority || 'Media',
-        projectId: task.projectId || 0,
-        assignedTo: task.assignedTo || 0,
+        projectId: task.projectId ?? 0,
+        assignedTo: task.assignedTo ?? 0,
         dueDate: task.dueDate || '',
-        estimatedHours: task.estimatedHours || ''
+        estimatedHours: task.estimatedHours ?? ''
       });
     } else {
       setFormData({
@@ -41,10 +41,11 @@ const TaskForm = ({ task, projects, users, onAdd, onUpdate, onDelete, onClear })
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: name === 'projectId' || name === 'assignedTo' ? parseInt(value) || 0 : value
-    }));
+    let next = value;
+    if (name === 'projectId' || name === 'assignedTo') {
+      next = value === '' || value === '0' ? 0 : value;
+    }
+    setFormData(prev => ({ ...prev, [name]: next }));
   };
 
   const handleSubmit = (e) => {

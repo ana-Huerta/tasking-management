@@ -1,35 +1,40 @@
 import React, { useState, useEffect } from 'react';
-import { Storage } from '../../services/storage';
+import { api } from '../../services/api';
 import './NotificationsTab.css';
 
 const NotificationsTab = ({ user }) => {
   const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const loadNotifications = async () => {
+    if (!user) return;
+    setLoading(true);
+    try {
+      const data = await api.getNotifications(user.id, true);
+      const list = Array.isArray(data) ? data : [];
+      setNotifications(list.map(notif => ({
+        ...notif,
+        date: new Date(notif.createdAt).toLocaleString('es-ES')
+      })));
+    } catch (err) {
+      setNotifications([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     loadNotifications();
-  }, [user]);
+  }, [user?.id]);
 
-  const loadNotifications = () => {
+  const markAsRead = async () => {
     if (!user) return;
-
-    const allNotifications = Storage.getNotifications().filter(n => 
-      n.userId === user.id && !n.read
-    );
-
-    const formattedNotifications = allNotifications.map(notif => ({
-      ...notif,
-      date: new Date(notif.createdAt).toLocaleString('es-ES')
-    }));
-
-    setNotifications(formattedNotifications);
-  };
-
-  const markAsRead = () => {
-    if (!user) return;
-
-    Storage.markNotificationsRead(user.id);
-    loadNotifications();
-    alert('Notificaciones marcadas como leídas');
+    try {
+      await api.markNotificationsRead(user.id);
+      await loadNotifications();
+    } catch (err) {
+      alert(err.message || 'Error al marcar como leídas');
+    }
   };
 
   return (
@@ -42,7 +47,7 @@ const NotificationsTab = ({ user }) => {
         <div className="notifications-actions-card">
           <h3>Acciones</h3>
           <div className="form-actions">
-            <button onClick={loadNotifications} className="btn-primary">
+            <button onClick={loadNotifications} className="btn-primary" disabled={loading}>
               Cargar Notificaciones
             </button>
             <button onClick={markAsRead} className="btn-secondary">
@@ -56,7 +61,9 @@ const NotificationsTab = ({ user }) => {
             Notificaciones
             {notifications.length > 0 && ` (${notifications.length})`}
           </h3>
-          {notifications.length > 0 ? (
+          {loading ? (
+            <div className="empty-state"><p>Cargando…</p></div>
+          ) : notifications.length > 0 ? (
             <div className="notifications-list">
               {notifications.map(notif => (
                 <div key={notif.id} className="notification-item">

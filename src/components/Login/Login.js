@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
-import { Storage } from '../../services/storage';
+import { api } from '../../services/api';
 import './Login.css';
 
 const Login = ({ onLogin }) => {
   const [username, setUsername] = useState('admin');
   const [password, setPassword] = useState('admin');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
@@ -16,13 +17,14 @@ const Login = ({ onLogin }) => {
       return;
     }
 
-    const users = Storage.getUsers();
-    const user = users.find(u => u.username === username && u.password === password);
-
-    if (user) {
+    setLoading(true);
+    try {
+      const user = await api.login(username, password);
       onLogin(user);
-    } else {
-      setError('Credenciales inválidas');
+    } catch (err) {
+      setError(err.message || 'Credenciales inválidas');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -61,8 +63,8 @@ const Login = ({ onLogin }) => {
             />
           </div>
 
-          <button type="submit" className="btn-primary">
-            Entrar
+          <button type="submit" className="btn-primary" disabled={loading}>
+            {loading ? 'Entrando…' : 'Entrar'}
           </button>
         </form>
 

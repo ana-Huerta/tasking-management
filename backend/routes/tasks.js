@@ -11,7 +11,7 @@ const toObjectId = (v) => {
   return null;
 };
 
-// GET
+// GET /api/tasks
 router.get('/', async (req, res) => {
   try {
     const tasks = await Task.find({}).sort({ createdAt: -1 });
@@ -21,7 +21,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-// POST
+// POST /api/tasks
 router.post('/', async (req, res) => {
   try {
     const body = req.body;
@@ -68,7 +68,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-// PUT
+// PUT /api/tasks/:id
 router.put('/:id', async (req, res) => {
   try {
     if (!mongoose.isValidObjectId(req.params.id)) {
@@ -128,7 +128,7 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-// DELETE
+// DELETE /api/tasks/:id
 router.delete('/:id', async (req, res) => {
   try {
     if (!mongoose.isValidObjectId(req.params.id)) {

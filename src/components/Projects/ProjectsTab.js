@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Storage } from '../../services/storage';
+import { api } from '../../services/api';
 import ProjectForm from './ProjectForm';
 import ProjectList from './ProjectList';
 import './ProjectsTab.css';
@@ -7,36 +7,58 @@ import './ProjectsTab.css';
 const ProjectsTab = () => {
   const [projects, setProjects] = useState([]);
   const [selectedProject, setSelectedProject] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     loadProjects();
   }, []);
 
-  const loadProjects = () => {
-    setProjects(Storage.getProjects());
+  const loadProjects = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const data = await api.getProjects();
+      setProjects(Array.isArray(data) ? data : []);
+    } catch (err) {
+      setError(err.message || 'Error al cargar proyectos');
+      setProjects([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleAddProject = (projectData) => {
-    Storage.addProject(projectData);
-    loadProjects();
-    setSelectedProject(null);
-  };
-
-  const handleUpdateProject = (projectData) => {
-    if (!selectedProject) return;
-    Storage.updateProject(selectedProject.id, projectData);
-    loadProjects();
-    setSelectedProject(null);
-  };
-
-  const handleDeleteProject = (projectId) => {
-    const project = Storage.getProjects().find(p => p.id === projectId);
-    if (!project) return;
-
-    if (window.confirm('¿Eliminar proyecto: ' + project.name + '?')) {
-      Storage.deleteProject(projectId);
+  const handleAddProject = async (projectData) => {
+    try {
+      await api.addProject(projectData);
       loadProjects();
       setSelectedProject(null);
+    } catch (err) {
+      alert(err.message || 'Error al agregar proyecto');
+    }
+  };
+
+  const handleUpdateProject = async (projectData) => {
+    if (!selectedProject) return;
+    try {
+      await api.updateProject(selectedProject.id, projectData);
+      loadProjects();
+      setSelectedProject(null);
+    } catch (err) {
+      alert(err.message || 'Error al actualizar proyecto');
+    }
+  };
+
+  const handleDeleteProject = async (projectId) => {
+    const project = projects.find(p => p.id === projectId);
+    if (!project) return;
+    if (!window.confirm('¿Eliminar proyecto: ' + project.name + '?')) return;
+    try {
+      await api.deleteProject(projectId);
+      loadProjects();
+      setSelectedProject(null);
+    } catch (err) {
+      alert(err.message || 'Error al eliminar proyecto');
     }
   };
 
@@ -47,6 +69,24 @@ const ProjectsTab = () => {
   const handleClearForm = () => {
     setSelectedProject(null);
   };
+
+  if (loading) {
+    return (
+      <div className="projects-tab">
+        <div className="projects-header"><h2>Gestión de Proyectos</h2></div>
+        <div className="loading-state">Cargando…</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="projects-tab">
+        <div className="projects-header"><h2>Gestión de Proyectos</h2></div>
+        <div className="error-state">{error}</div>
+      </div>
+    );
+  }
 
   return (
     <div className="projects-tab">
