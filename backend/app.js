@@ -3,13 +3,13 @@ const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/db');
 
-const authRoutes = require('./backend/routes/auth');
-const usersRoutes = require('./backend/routes/users');
-const projectsRoutes = require('./backend/routes/projects');
-const tasksRoutes = require('./backend/routes/tasks');
-const commentsRoutes = require('./backend/routes/comments');
-const historyRoutes = require('./backend/routes/historial');
-const notificationsRoutes = require('./backend/routes/notifications');
+const authRoutes = require('./routes/auth');
+const usersRoutes = require('./routes/users');
+const projectsRoutes = require('./routes/projects');
+const tasksRoutes = require('./routes/tasks');
+const commentsRoutes = require('./routes/comments');
+const historyRoutes = require('./routes/historial');
+const notificationsRoutes = require('./routes/notifications');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
