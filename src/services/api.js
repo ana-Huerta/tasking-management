@@ -1,4 +1,4 @@
-const BASE_URL = process.env.REACT_APP_API_URL;
+const BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:4000/api';
 
 async function request(endpoint, options = {}) {
   const url = `${BASE_URL}${endpoint}`;
@@ -95,7 +95,8 @@ export const api = {
  */
 export async function isApiAvailable() {
   try {
-    const res = await fetch(`${BASE_URL.replace('/api', '')}/api/health`);
+    const base = BASE_URL ? BASE_URL.replace(/\/api\/?$/, '') : 'http://localhost:4000';
+    const res = await fetch(`${base}/api/health`);
     return res.ok;
   } catch {
     return false;

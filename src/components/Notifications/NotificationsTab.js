@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { api } from '../../services/index';
+import React, { useState, useEffect, useCallback } from 'react';
+import { api } from '../../services/api';
 import './NotificationsTab.css';
 
 const NotificationsTab = ({ user }) => {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const loadNotifications = async () => {
+  const loadNotifications = useCallback(async () => {
     if (!user) return;
     setLoading(true);
     try {
@@ -21,11 +21,11 @@ const NotificationsTab = ({ user }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
 
   useEffect(() => {
     loadNotifications();
-  }, [user?.id]);
+  }, [loadNotifications]);
 
   const markAsRead = async () => {
     if (!user) return;

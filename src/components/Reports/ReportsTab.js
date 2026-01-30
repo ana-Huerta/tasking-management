@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { api } from '../../services/index';
+import { api } from '../../services/api';
 import './ReportsTab.css';
 
 const ReportsTab = () => {
@@ -59,10 +59,12 @@ const ReportsTab = () => {
       const tasks = Array.isArray(tasksRes) ? tasksRes : [];
       const projects = Array.isArray(projectsRes) ? projectsRes : [];
 
+      const esc = (s) => `"${(String(s || '')).replace(/"/g, '""')}"`;
       let csv = 'ID,Título,Estado,Prioridad,Proyecto\n';
       tasks.forEach(task => {
         const project = projects.find(p => p.id === task.projectId);
-        csv += `${task.id},"${(task.title || '').replace(/"/g, '""')}","${task.status || 'Pendiente'}","${task.priority || 'Media'}","${project ? project.name : 'Sin proyecto'}"\n`;
+        const name = project ? project.name : 'Sin proyecto';
+        csv += `${task.id},${esc(task.title || '')},${esc(task.status || 'Pendiente')},${esc(task.priority || 'Media')},${esc(name)}\n`;
       });
 
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });

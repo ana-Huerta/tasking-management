@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { api } from '../../services/index';
+import { api } from '../../services/api';
 import ProjectForm from './ProjectForm';
 import ProjectList from './ProjectList';
 import './ProjectsTab.css';
