@@ -80,6 +80,11 @@ router.put('/:id', async (req, res) => {
       return res.status(404).json({ error: 'Tarea no encontrado' });
     }
 
+    const parseNumberOrDefault = (value, defaultValue) => {
+      const n = Number(value);
+      return Number.isFinite(n) ? n : defaultValue;
+    };
+
     const taskData = {
       title: body.title?.trim() ?? oldTask.title,
       description: body.description ?? oldTask.description,
@@ -88,11 +93,11 @@ router.put('/:id', async (req, res) => {
       projectId: body.projectId !== undefined ? toObjectId(body.projectId) : oldTask.projectId,
       assignedTo: body.assignedTo !== undefined ? toObjectId(body.assignedTo) : oldTask.assignedTo,
       dueDate: body.dueDate ?? oldTask.dueDate,
-      estimatedHours: Number(body.estimatedHours) ?? oldTask.estimatedHours,
-      actualHours: Number(body.actualHours) ?? oldTask.actualHours,
+      estimatedHours: parseNumberOrDefault(body.estimatedHours, oldTask.estimatedHours),
+      actualHours: parseNumberOrDefault(body.actualHours, oldTask.actualHours),
       createdBy: oldTask.createdBy,
       createdAt: oldTask.createdAt
-    };
+};
 
     if (oldTask.status !== taskData.status) {
       await HistoryEntry.create({
