@@ -51,10 +51,18 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: err.message || 'Error interno del servidor' });
 });
 
-(async () => {
-  await connectDB();
-  await seedUsers();
-  app.listen(PORT, () => {
-    console.log(`Servidor API en http://localhost:${PORT}`);
-  });
-})();
+const startServer = async () => {
+  try {
+    await connectDB();
+
+    app.listen(process.env.PORT || 3000, () => {
+      console.log("API corriendo");
+    });
+
+  } catch (error) {
+    console.error("Error al iniciar el servidor:", error);
+    process.exit(1);
+  }
+};
+
+startServer();
