@@ -6,29 +6,24 @@ import ProjectsTab from '../Projects/ProjectsTab';
 import CommentsTab from '../Comments/CommentsTab';
 import HistoryTab from '../History/HistoryTab';
 import NotificationsTab from '../Notifications/NotificationsTab';
-import SearchTab from '../Search/SearchTab';
+import UsersTab from '../Users/UsersTab';
 import ReportsTab from '../Reports/ReportsTab';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {faListCheck} from '@fortawesome/free-solid-svg-icons';
-import {faFolderOpen} from '@fortawesome/free-regular-svg-icons';
-import {faComment} from '@fortawesome/free-regular-svg-icons';
-import {faClockRotateLeft} from '@fortawesome/free-solid-svg-icons';
-import {faBell} from '@fortawesome/free-regular-svg-icons';
-import {faMagnifyingGlass} from '@fortawesome/free-solid-svg-icons';
-import {faBookOpen} from '@fortawesome/free-solid-svg-icons';
+import { faListCheck, faClockRotateLeft, faUserPlus, faBookOpen } from '@fortawesome/free-solid-svg-icons';
+import { faFolderOpen, faComment, faBell } from '@fortawesome/free-regular-svg-icons';
 import './Dashboard.css';
 
 const Dashboard = ({ user, onLogout }) => {
   const [activeTab, setActiveTab] = useState('tasks');
 
   const tabs = [
-    { id: 'tasks', label: 'Tareas', icon: <FontAwesomeIcon icon={faListCheck} size='lg'/> },
-    { id: 'projects', label: 'Proyectos', icon: <FontAwesomeIcon icon={faFolderOpen} size='lg'/> },
-    { id: 'comments', label: 'Comentarios', icon:  <FontAwesomeIcon icon={faComment} size='lg'/>},
-    { id: 'history', label: 'Historial', icon: <FontAwesomeIcon icon={faClockRotateLeft} size='lg'/>},
-    { id: 'notifications', label: 'Notificaciones', icon: <FontAwesomeIcon icon={faBell} size='lg'/> },
-    { id: 'search', label: 'Búsqueda', icon: <FontAwesomeIcon icon={faMagnifyingGlass} size='lg'/> },
-    { id: 'reports', label: 'Reportes', icon: <FontAwesomeIcon icon={faBookOpen} size='lg'/> }
+    { id: 'tasks', label: 'Tareas', icon: <FontAwesomeIcon icon={faListCheck} size="lg" /> },
+    { id: 'projects', label: 'Proyectos', icon: <FontAwesomeIcon icon={faFolderOpen} size="lg" /> },
+    { id: 'comments', label: 'Comentarios', icon: <FontAwesomeIcon icon={faComment} size="lg" /> },
+    { id: 'history', label: 'Historial', icon: <FontAwesomeIcon icon={faClockRotateLeft} size="lg" /> },
+    { id: 'notifications', label: 'Notificaciones', icon: <FontAwesomeIcon icon={faBell} size="lg" /> },
+    { id: 'users', label: 'Usuarios', icon: <FontAwesomeIcon icon={faUserPlus} size="lg" /> },
+    { id: 'reports', label: 'Reportes', icon: <FontAwesomeIcon icon={faBookOpen} size="lg" /> }
   ];
 
   const renderTabContent = () => {
@@ -43,8 +38,8 @@ const Dashboard = ({ user, onLogout }) => {
         return <HistoryTab />;
       case 'notifications':
         return <NotificationsTab user={user} />;
-      case 'search':
-        return <SearchTab />;
+      case 'users':
+        return <UsersTab />;
       case 'reports':
         return <ReportsTab />;
       default:

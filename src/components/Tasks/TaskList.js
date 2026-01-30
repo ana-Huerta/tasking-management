@@ -42,7 +42,6 @@ const TaskList = ({ tasks, projects, users, onSelect, selectedTaskId }) => {
         <table className="task-table">
           <thead>
             <tr>
-              <th>ID</th>
               <th>Título</th>
               <th>Estado</th>
               <th>Prioridad</th>
@@ -63,7 +62,6 @@ const TaskList = ({ tasks, projects, users, onSelect, selectedTaskId }) => {
                   className={isSelected ? 'selected' : ''}
                   onClick={() => onSelect(task)}
                 >
-                  <td>{task.id}</td>
                   <td className="task-title">{task.title}</td>
                   <td>
                     <span

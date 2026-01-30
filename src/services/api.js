@@ -30,6 +30,9 @@ export const api = {
   async getUsers() {
     return request('/users');
   },
+  async addUser(username, password) {
+    return request('/users', { method: 'POST', body: { username, password } });
+  },
 
   // Projects
   async getProjects() {

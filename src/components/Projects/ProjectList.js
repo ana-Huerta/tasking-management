@@ -21,7 +21,6 @@ const ProjectList = ({ projects, onSelect, selectedProjectId }) => {
         <table className="project-table">
           <thead>
             <tr>
-              <th>ID</th>
               <th>Nombre</th>
               <th>Descripción</th>
             </tr>
@@ -36,7 +35,6 @@ const ProjectList = ({ projects, onSelect, selectedProjectId }) => {
                   className={isSelected ? 'selected' : ''}
                   onClick={() => onSelect(project)}
                 >
-                  <td>{project.id}</td>
                   <td className="project-name">{project.name}</td>
                   <td>{project.description || '-'}</td>
                 </tr>

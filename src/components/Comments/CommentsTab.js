@@ -1,17 +1,35 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { api } from '../../services/api';
 import './CommentsTab.css';
 
 const CommentsTab = ({ user }) => {
-  const [taskId, setTaskId] = useState('');
+  const [tasks, setTasks] = useState([]);
+  const [selectedTaskId, setSelectedTaskId] = useState('');
   const [commentText, setCommentText] = useState('');
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [loadingTasks, setLoadingTasks] = useState(true);
+
+  useEffect(() => {
+    const load = async () => {
+      setLoadingTasks(true);
+      try {
+        const data = await api.getTasks();
+        setTasks(Array.isArray(data) ? data : []);
+      } catch {
+        setTasks([]);
+      } finally {
+        setLoadingTasks(false);
+      }
+    };
+    load();
+  }, []);
+
+  const selectedTask = tasks.find(t => t.id === selectedTaskId);
 
   const handleAddComment = async () => {
-    const tid = taskId.trim();
-    if (!tid) {
-      alert('ID de tarea requerido');
+    if (!selectedTaskId) {
+      alert('Selecciona una tarea');
       return;
     }
     if (!commentText.trim()) {
@@ -21,7 +39,7 @@ const CommentsTab = ({ user }) => {
     setLoading(true);
     try {
       await api.addComment({
-        taskId: tid,
+        taskId: selectedTaskId,
         userId: user.id,
         commentText: commentText.trim()
       });
@@ -35,15 +53,14 @@ const CommentsTab = ({ user }) => {
   };
 
   const loadComments = async () => {
-    const tid = taskId.trim();
-    if (!tid) {
+    if (!selectedTaskId) {
       setComments([]);
       return;
     }
     setLoading(true);
     try {
       const [commentsRes, usersRes] = await Promise.all([
-        api.getComments(tid),
+        api.getComments(selectedTaskId),
         api.getUsers()
       ]);
       const users = Array.isArray(usersRes) ? usersRes : [];
@@ -57,7 +74,7 @@ const CommentsTab = ({ user }) => {
         };
       });
       setComments(formatted);
-    } catch (err) {
+    } catch {
       setComments([]);
     } finally {
       setLoading(false);
@@ -74,14 +91,20 @@ const CommentsTab = ({ user }) => {
         <div className="comments-form-card">
           <h3>Agregar Comentario</h3>
           <div className="form-group">
-            <label htmlFor="taskId">ID Tarea</label>
-            <input
-              type="text"
-              id="taskId"
-              value={taskId}
-              onChange={(e) => setTaskId(e.target.value)}
-              placeholder="ID de la tarea (MongoDB)"
-            />
+            <label htmlFor="taskSelect">Tarea</label>
+            <select
+              id="taskSelect"
+              value={selectedTaskId}
+              onChange={(e) => setSelectedTaskId(e.target.value)}
+              disabled={loadingTasks}
+            >
+              <option value="">Seleccionar tarea</option>
+              {tasks.map(t => (
+                <option key={t.id} value={t.id}>
+                  {t.title || '(sin título)'}
+                </option>
+              ))}
+            </select>
           </div>
           <div className="form-group">
             <label htmlFor="commentText">Comentario</label>
@@ -94,10 +117,10 @@ const CommentsTab = ({ user }) => {
             />
           </div>
           <div className="form-actions">
-            <button onClick={handleAddComment} className="btn-primary" disabled={loading}>
+            <button onClick={handleAddComment} className="btn-primary" disabled={loading || !selectedTaskId}>
               {loading ? 'Enviando…' : 'Agregar Comentario'}
             </button>
-            <button onClick={loadComments} className="btn-secondary" disabled={loading}>
+            <button onClick={loadComments} className="btn-secondary" disabled={loading || !selectedTaskId}>
               Cargar Comentarios
             </button>
           </div>
@@ -105,10 +128,10 @@ const CommentsTab = ({ user }) => {
 
         <div className="comments-list-card">
           <h3>
-            Comentarios {taskId && `- Tarea #${taskId}`}
+            Comentarios {selectedTask && `- ${selectedTask.title}`}
             {comments.length > 0 && ` (${comments.length})`}
           </h3>
-          {taskId ? (
+          {selectedTaskId ? (
             loading ? (
               <div className="empty-state"><p>Cargando…</p></div>
             ) : comments.length > 0 ? (
@@ -130,7 +153,7 @@ const CommentsTab = ({ user }) => {
             )
           ) : (
             <div className="empty-state">
-              <p>Ingresa un ID de tarea para ver los comentarios</p>
+              <p>Selecciona una tarea para ver o agregar comentarios</p>
             </div>
           )}
         </div>
